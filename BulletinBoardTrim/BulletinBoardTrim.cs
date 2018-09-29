@@ -12,75 +12,20 @@ namespace BulletinBoardTrimEffect
 {
     public class PluginSupportInfo : IPluginSupportInfo
     {
-        public string Author
-        {
-            get
-            {
-                return ((AssemblyCopyrightAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false)[0]).Copyright;
-            }
-        }
-        public string Copyright
-        {
-            get
-            {
-                return ((AssemblyDescriptionAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false)[0]).Description;
-            }
-        }
-
-        public string DisplayName
-        {
-            get
-            {
-                return ((AssemblyProductAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false)[0]).Product;
-            }
-        }
-
-        public Version Version
-        {
-            get
-            {
-                return base.GetType().Assembly.GetName().Version;
-            }
-        }
-
-        public Uri WebsiteUri
-        {
-            get
-            {
-                return new Uri("http://www.getpaint.net/redirect/plugins.html");
-            }
-        }
+        public string Author => base.GetType().Assembly.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright;
+        public string Copyright => base.GetType().Assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
+        public string DisplayName => base.GetType().Assembly.GetCustomAttribute<AssemblyProductAttribute>().Product;
+        public Version Version => base.GetType().Assembly.GetName().Version;
+        public Uri WebsiteUri => new Uri("https://forums.getpaint.net/index.php?showtopic=109942");
     }
 
     [PluginSupportInfo(typeof(PluginSupportInfo), DisplayName = "Bulletin Board Trim")]
     public class BulletinBoardTrimEffectPlugin : PropertyBasedEffect
     {
-        public static string StaticName
-        {
-            get
-            {
-                return "Bulletin Board Trim";
-            }
-        }
-
-        public static Image StaticIcon
-        {
-            get
-            {
-                return new Bitmap(typeof(BulletinBoardTrimEffectPlugin), "BulletinBoardTrim.png");
-            }
-        }
-
-        public static string SubmenuName
-        {
-            get
-            {
-                return SubmenuNames.Render;
-            }
-        }
+        private static readonly Image StaticIcon = new Bitmap(typeof(BulletinBoardTrimEffectPlugin), "BulletinBoardTrim.png");
 
         public BulletinBoardTrimEffectPlugin()
-            : base(StaticName, StaticIcon, SubmenuName, EffectFlags.Configurable)
+            : base("Bulletin Board Trim", StaticIcon, SubmenuNames.Render, EffectFlags.Configurable)
         {
         }
 
@@ -110,31 +55,31 @@ namespace BulletinBoardTrimEffect
             Amount2Option8
         }
 
-
         protected override PropertyCollection OnCreatePropertyCollection()
         {
-            List<Property> props = new List<Property>();
+            ColorBgra primaryColor = EnvironmentParameters.PrimaryColor.NewAlpha(255);
+            ColorBgra secondaryColor = EnvironmentParameters.SecondaryColor.NewAlpha(255);
 
-            ColorBgra PrimaryColor = EnvironmentParameters.PrimaryColor;
-            PrimaryColor.A = 255;
-            ColorBgra SecondaryColor = EnvironmentParameters.SecondaryColor;
-            SecondaryColor.A = 255;
+            List<Property> props = new List<Property>
+            {
+                new Int32Property(PropertyNames.Amount1, 50, 0, 100),
+                StaticListChoiceProperty.CreateForEnum<Amount2Options>(PropertyNames.Amount2, 0, false),
+                new Int32Property(PropertyNames.Amount3, 60, 5, 100),
+                new Int32Property(PropertyNames.Amount4, 20, 5, 100),
+                new Int32Property(PropertyNames.Amount5, ColorBgra.ToOpaqueInt32(primaryColor), 0, 0xffffff),
+                new BooleanProperty(PropertyNames.Amount6, false),
+                new BooleanProperty(PropertyNames.Amount7, false),
+                new Int32Property(PropertyNames.Amount8, 2, 2, 10),
+                new Int32Property(PropertyNames.Amount9, ColorBgra.ToOpaqueInt32(secondaryColor), 0, 0xffffff),
+                new Int32Property(PropertyNames.Amount10, 255, 0, 255)
+            };
 
-            props.Add(new Int32Property(PropertyNames.Amount1, 50, 0, 100));
-            props.Add(StaticListChoiceProperty.CreateForEnum<Amount2Options>(PropertyNames.Amount2, 0, false));
-            props.Add(new Int32Property(PropertyNames.Amount3, 60, 5, 100));
-            props.Add(new Int32Property(PropertyNames.Amount4, 20, 5, 100));
-            props.Add(new Int32Property(PropertyNames.Amount5, ColorBgra.ToOpaqueInt32(PrimaryColor), 0, 0xffffff));
-            props.Add(new BooleanProperty(PropertyNames.Amount6, false));
-            props.Add(new BooleanProperty(PropertyNames.Amount7, false));
-            props.Add(new Int32Property(PropertyNames.Amount8, 2, 2, 10));
-            props.Add(new Int32Property(PropertyNames.Amount9, ColorBgra.ToOpaqueInt32(SecondaryColor), 0, 0xffffff));
-            props.Add(new Int32Property(PropertyNames.Amount10, 255, 0, 255));
-
-            List<PropertyCollectionRule> propRules = new List<PropertyCollectionRule>();
-            propRules.Add(new ReadOnlyBoundToBooleanRule(PropertyNames.Amount7, PropertyNames.Amount6, true));
-            propRules.Add(new ReadOnlyBoundToBooleanRule(PropertyNames.Amount8, PropertyNames.Amount6, true));
-            propRules.Add(new ReadOnlyBoundToBooleanRule(PropertyNames.Amount9, PropertyNames.Amount6, true));
+            List<PropertyCollectionRule> propRules = new List<PropertyCollectionRule>
+            {
+                new ReadOnlyBoundToBooleanRule(PropertyNames.Amount7, PropertyNames.Amount6, true),
+                new ReadOnlyBoundToBooleanRule(PropertyNames.Amount8, PropertyNames.Amount6, true),
+                new ReadOnlyBoundToBooleanRule(PropertyNames.Amount9, PropertyNames.Amount6, true)
+            };
 
             return new PropertyCollection(props, propRules);
         }
@@ -184,7 +129,6 @@ namespace BulletinBoardTrimEffect
             Amount9 = ColorBgra.FromOpaqueInt32(newToken.GetProperty<Int32Property>(PropertyNames.Amount9).Value);
             Amount10 = newToken.GetProperty<Int32Property>(PropertyNames.Amount10).Value;
 
-
             Rectangle selection = EnvironmentParameters.GetSelection(srcArgs.Surface.Bounds).GetBoundsInt();
             int centerX = ((selection.Right - selection.Left) / 2) + selection.Left;
             int centerY = ((selection.Bottom - selection.Top) / 2) + selection.Top;
@@ -201,14 +145,13 @@ namespace BulletinBoardTrimEffect
             bottomPoints[0] = new PointF(selection.Left - 50, selection.Bottom + 50);
             for (int i = 0; i < selection.Width; i++)
             {
-                wave = trimSize + getEquation(i - offsetX);
+                wave = trimSize + GetEquation(i - offsetX);
 
                 topPoints[i + 1] = new PointF(selection.Left + i, selection.Top + wave);
                 bottomPoints[i + 1] = new PointF(selection.Left + i, selection.Bottom - wave);
             }
             topPoints[selection.Width + 1] = new PointF(selection.Right + 10, selection.Top - 10);
             bottomPoints[selection.Width + 1] = new PointF(selection.Right + 100, selection.Bottom + 100);
-
 
             // Vertical Points
             PointF[] rightPoints = new PointF[selection.Height + 2];
@@ -218,14 +161,13 @@ namespace BulletinBoardTrimEffect
             leftPoints[0] = new PointF(selection.Left - 50, selection.Top - 50);
             for (int i = 0; i < selection.Height; i++)
             {
-                wave = trimSize + getEquation(i - offsetY);
+                wave = trimSize + GetEquation(i - offsetY);
 
                 rightPoints[i + 1] = new PointF(selection.Right - wave, selection.Top + i);
                 leftPoints[i + 1] = new PointF(selection.Left + wave, selection.Top + i);
             }
             rightPoints[selection.Height + 1] = new PointF(selection.Right + 100, selection.Bottom + 100);
             leftPoints[selection.Height + 1] = new PointF(selection.Left - 100, selection.Bottom + 100);
-
 
             if (trimSurface == null)
                 trimSurface = new Surface(srcArgs.Surface.Size);
@@ -281,10 +223,8 @@ namespace BulletinBoardTrimEffect
                         board.FillPolygon(trimBrush, bottomPoints);
                         board.FillPolygon(trimBrush, leftPoints);
                     }
-
                 }
             }
-
 
             base.OnSetRenderInfo(newToken, dstArgs, srcArgs);
         }
@@ -298,22 +238,21 @@ namespace BulletinBoardTrimEffect
             }
         }
 
+        private int Amount1 = 50; // [0,100] Trim Size
+        private byte Amount2 = 0; // Hump Style|Round Wave|Pointy Wave|Square Wave|Wishbone Wave|Pointy / Round (out)|Pointy / Round (in)|Pointy & Round (in)|Pointy & Round (out)
+        private int Amount3 = 60; // [5,100] Hump Gap
+        private int Amount4 = 20; // [5,100] Hump Protrusion
+        private ColorBgra Amount5 = ColorBgra.FromBgr(0, 0, 0); // [PrimaryColor] Trim Color
+        private bool Amount6 = false; // [0,1] Border
+        private bool Amount7 = false; // [0,1] Overlap in Corners
+        private int Amount8 = 2; // [2,10] Border Width
+        private ColorBgra Amount9 = ColorBgra.FromBgr(255, 0, 255); // [SecondaryColor] Border Color
+        private int Amount10 = 255; // [0,255] Trim Opacity
 
-        int Amount1 = 50; // [0,100] Trim Size
-        byte Amount2 = 0; // Hump Style|Round Wave|Pointy Wave|Square Wave|Wishbone Wave|Pointy / Round (out)|Pointy / Round (in)|Pointy & Round (in)|Pointy & Round (out)
-        int Amount3 = 60; // [5,100] Hump Gap
-        int Amount4 = 20; // [5,100] Hump Protrusion
-        ColorBgra Amount5 = ColorBgra.FromBgr(0, 0, 0); // [PrimaryColor] Trim Color
-        bool Amount6 = false; // [0,1] Border
-        bool Amount7 = false; // [0,1] Overlap in Corners
-        int Amount8 = 2; // [2,10] Border Width
-        ColorBgra Amount9 = ColorBgra.FromBgr(255, 0, 255); // [SecondaryColor] Border Color
-        int Amount10 = 255; // [0,255] Trim Opacity
+        private readonly BinaryPixelOp normalOp = LayerBlendModeUtil.CreateCompositionOp(LayerBlendMode.Normal);
+        private Surface trimSurface;
 
-        BinaryPixelOp normalOp = LayerBlendModeUtil.CreateCompositionOp(LayerBlendMode.Normal);
-        Surface trimSurface;
-
-        void Render(Surface dst, Surface src, Rectangle rect)
+        private void Render(Surface dst, Surface src, Rectangle rect)
         {
             ColorBgra sourcePixel, trimPixel;
             for (int y = rect.Top; y < rect.Bottom; y++)
@@ -329,46 +268,35 @@ namespace BulletinBoardTrimEffect
             }
         }
 
-        float getEquation(int i)
+        private float GetEquation(int i)
         {
             i = Math.Abs(i);
-
-            float equation = 0;
             switch (Amount2)
             {
                 case 0: // Cosine Wave
-                    equation = (float)(Amount4 / 2f * Math.Cos(Math.PI * i / (Amount3 / 2f))) + Amount4 / 2f;
-                    break;
+                    return (float)(Amount4 / 2f * Math.Cos(Math.PI * i / (Amount3 / 2f))) + Amount4 / 2f;
                 case 1: // Pointy Wave
-                    equation = (float)((Amount4 / Math.PI) * Math.Acos(Math.Cos(2 * (Math.PI / Amount3) * (i + Amount3 / 2f))));
-                    break;
+                    return (float)((Amount4 / Math.PI) * Math.Acos(Math.Cos(2 * (Math.PI / Amount3) * (i + Amount3 / 2f))));
                 case 2: // Square Wave
-                    equation = (Math.Sin(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)) >= 0) ? Amount4 : 0;
-                    break;
+                    return (Math.Sin(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)) >= 0) ? Amount4 : 0;
                 case 3: // Wish Bone
-                    equation = ((int)((i + Amount3 / 4f) / (Amount3 / 2f)) % 2 != 0) ?
+                    return ((int)((i + Amount3 / 4f) / (Amount3 / 2f)) % 2 != 0) ?
                                     (float)(Amount4 / 2f * Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)))) :
                                     (float)(Amount4 / 2f * -Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)))) + Amount4;
-                    break;
                 case 4: // Pointy / Round (out)
-                    equation = (float)(Amount4 * -Math.Abs(Math.Sin(Math.PI * i / Amount3))) + Amount4;
-                    break;
+                    return (float)(Amount4 * -Math.Abs(Math.Sin(Math.PI * i / Amount3))) + Amount4;
                 case 5: // Pointy / Round (in)
-                    equation = (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * i / Amount3)));
-                    break;
+                    return (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * i / Amount3)));
                 case 6: // Pointy & Round (in)
-                    equation = ((int)((i + Amount3 / 2f) / Amount3) % 2 != 0) ?
+                    return ((int)((i + Amount3 / 2f) / Amount3) % 2 != 0) ?
                                     (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * (i + Amount3) / Amount3))) :
                                     (float)(Amount4 * -Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 2f) / Amount3))) + Amount4;
-                    break;
                 case 7: // Pointy & Round (out)
-                    equation = ((int)((i + Amount3 / 2f) / Amount3) % 2 != 0) ?
+                    return ((int)((i + Amount3 / 2f) / Amount3) % 2 != 0) ?
                                     (float)(Amount4 * -Math.Abs(Math.Cos(Math.PI * (i + Amount3) / Amount3))) + Amount4 :
                                     (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 2f) / Amount3)));
-                    break;
             }
-            return equation;
+            return 0;
         }
-
     }
 }
