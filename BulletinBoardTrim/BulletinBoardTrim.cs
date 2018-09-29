@@ -29,7 +29,7 @@ namespace BulletinBoardTrimEffect
         {
         }
 
-        public enum PropertyNames
+        private enum PropertyNames
         {
             Amount1,
             Amount2,
@@ -43,7 +43,7 @@ namespace BulletinBoardTrimEffect
             Amount10
         }
 
-        public enum Amount2Options
+        private enum Amount2Options
         {
             Amount2Option1,
             Amount2Option2,
