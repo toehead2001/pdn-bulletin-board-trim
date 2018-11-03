@@ -43,16 +43,16 @@ namespace BulletinBoardTrimEffect
             Amount10
         }
 
-        private enum Amount2Options
+        private enum HumpStyle
         {
-            Amount2Option1,
-            Amount2Option2,
-            Amount2Option3,
-            Amount2Option4,
-            Amount2Option5,
-            Amount2Option6,
-            Amount2Option7,
-            Amount2Option8
+            RoundWave,
+            PointyWave,
+            SquareWave,
+            WishboneWave,
+            PointyRound1Out,
+            PointyRound1In,
+            PointyRound2In,
+            PointyRound2Out
         }
 
         protected override PropertyCollection OnCreatePropertyCollection()
@@ -63,7 +63,7 @@ namespace BulletinBoardTrimEffect
             List<Property> props = new List<Property>
             {
                 new Int32Property(PropertyNames.Amount1, 50, 0, 100),
-                StaticListChoiceProperty.CreateForEnum<Amount2Options>(PropertyNames.Amount2, 0, false),
+                StaticListChoiceProperty.CreateForEnum<HumpStyle>(PropertyNames.Amount2, 0, false),
                 new Int32Property(PropertyNames.Amount3, 60, 5, 100),
                 new Int32Property(PropertyNames.Amount4, 20, 5, 100),
                 new Int32Property(PropertyNames.Amount5, ColorBgra.ToOpaqueInt32(primaryColor), 0, 0xffffff),
@@ -91,14 +91,14 @@ namespace BulletinBoardTrimEffect
             configUI.SetPropertyControlValue(PropertyNames.Amount1, ControlInfoPropertyNames.DisplayName, "Trim Size");
             configUI.SetPropertyControlValue(PropertyNames.Amount2, ControlInfoPropertyNames.DisplayName, "Hump Style");
             PropertyControlInfo Amount2Control = configUI.FindControlForPropertyName(PropertyNames.Amount2);
-            Amount2Control.SetValueDisplayName(Amount2Options.Amount2Option1, "Round Wave");
-            Amount2Control.SetValueDisplayName(Amount2Options.Amount2Option2, "Pointy Wave");
-            Amount2Control.SetValueDisplayName(Amount2Options.Amount2Option3, "Square Wave");
-            Amount2Control.SetValueDisplayName(Amount2Options.Amount2Option4, "Wishbone Wave");
-            Amount2Control.SetValueDisplayName(Amount2Options.Amount2Option5, "Pointy / Round (out)");
-            Amount2Control.SetValueDisplayName(Amount2Options.Amount2Option6, "Pointy / Round (in)");
-            Amount2Control.SetValueDisplayName(Amount2Options.Amount2Option7, "Pointy & Round (in)");
-            Amount2Control.SetValueDisplayName(Amount2Options.Amount2Option8, "Pointy & Round (out)");
+            Amount2Control.SetValueDisplayName(HumpStyle.RoundWave, "Round Wave");
+            Amount2Control.SetValueDisplayName(HumpStyle.PointyWave, "Pointy Wave");
+            Amount2Control.SetValueDisplayName(HumpStyle.SquareWave, "Square Wave");
+            Amount2Control.SetValueDisplayName(HumpStyle.WishboneWave, "Wishbone Wave");
+            Amount2Control.SetValueDisplayName(HumpStyle.PointyRound1Out, "Pointy / Round (out)");
+            Amount2Control.SetValueDisplayName(HumpStyle.PointyRound1In, "Pointy / Round (in)");
+            Amount2Control.SetValueDisplayName(HumpStyle.PointyRound2In, "Pointy & Round (in)");
+            Amount2Control.SetValueDisplayName(HumpStyle.PointyRound2Out, "Pointy & Round (out)");
             configUI.SetPropertyControlValue(PropertyNames.Amount3, ControlInfoPropertyNames.DisplayName, "Hump Gap");
             configUI.SetPropertyControlValue(PropertyNames.Amount4, ControlInfoPropertyNames.DisplayName, "Hump Protrusion");
             configUI.SetPropertyControlValue(PropertyNames.Amount5, ControlInfoPropertyNames.DisplayName, "Trim Color");
@@ -119,7 +119,7 @@ namespace BulletinBoardTrimEffect
         protected override void OnSetRenderInfo(PropertyBasedEffectConfigToken newToken, RenderArgs dstArgs, RenderArgs srcArgs)
         {
             Amount1 = newToken.GetProperty<Int32Property>(PropertyNames.Amount1).Value;
-            Amount2 = (byte)((int)newToken.GetProperty<StaticListChoiceProperty>(PropertyNames.Amount2).Value);
+            Amount2 = (HumpStyle)newToken.GetProperty<StaticListChoiceProperty>(PropertyNames.Amount2).Value;
             Amount3 = newToken.GetProperty<Int32Property>(PropertyNames.Amount3).Value;
             Amount4 = newToken.GetProperty<Int32Property>(PropertyNames.Amount4).Value;
             Amount5 = ColorBgra.FromOpaqueInt32(newToken.GetProperty<Int32Property>(PropertyNames.Amount5).Value);
@@ -239,7 +239,7 @@ namespace BulletinBoardTrimEffect
         }
 
         private int Amount1 = 50; // [0,100] Trim Size
-        private byte Amount2 = 0; // Hump Style|Round Wave|Pointy Wave|Square Wave|Wishbone Wave|Pointy / Round (out)|Pointy / Round (in)|Pointy & Round (in)|Pointy & Round (out)
+        private HumpStyle Amount2 = 0; // Hump Style|Round Wave|Pointy Wave|Square Wave|Wishbone Wave|Pointy / Round (out)|Pointy / Round (in)|Pointy & Round (in)|Pointy & Round (out)
         private int Amount3 = 60; // [5,100] Hump Gap
         private int Amount4 = 20; // [5,100] Hump Protrusion
         private ColorBgra Amount5 = ColorBgra.FromBgr(0, 0, 0); // [PrimaryColor] Trim Color
@@ -273,25 +273,25 @@ namespace BulletinBoardTrimEffect
             i = Math.Abs(i);
             switch (Amount2)
             {
-                case 0: // Cosine Wave
+                case HumpStyle.RoundWave: // Cosine Wave
                     return (float)(Amount4 / 2f * Math.Cos(Math.PI * i / (Amount3 / 2f))) + Amount4 / 2f;
-                case 1: // Pointy Wave
+                case HumpStyle.PointyWave: // Pointy Wave
                     return (float)((Amount4 / Math.PI) * Math.Acos(Math.Cos(2 * (Math.PI / Amount3) * (i + Amount3 / 2f))));
-                case 2: // Square Wave
+                case HumpStyle.SquareWave: // Square Wave
                     return (Math.Sin(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)) >= 0) ? Amount4 : 0;
-                case 3: // Wish Bone
+                case HumpStyle.WishboneWave: // Wish Bone
                     return ((int)((i + Amount3 / 4f) / (Amount3 / 2f)) % 2 != 0) ?
                                     (float)(Amount4 / 2f * Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)))) :
                                     (float)(Amount4 / 2f * -Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)))) + Amount4;
-                case 4: // Pointy / Round (out)
+                case HumpStyle.PointyRound1Out: // Pointy / Round (out)
                     return (float)(Amount4 * -Math.Abs(Math.Sin(Math.PI * i / Amount3))) + Amount4;
-                case 5: // Pointy / Round (in)
+                case HumpStyle.PointyRound1In: // Pointy / Round (in)
                     return (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * i / Amount3)));
-                case 6: // Pointy & Round (in)
+                case HumpStyle.PointyRound2In: // Pointy & Round (in)
                     return ((int)((i + Amount3 / 2f) / Amount3) % 2 != 0) ?
                                     (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * (i + Amount3) / Amount3))) :
                                     (float)(Amount4 * -Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 2f) / Amount3))) + Amount4;
-                case 7: // Pointy & Round (out)
+                case HumpStyle.PointyRound2Out: // Pointy & Round (out)
                     return ((int)((i + Amount3 / 2f) / Amount3) % 2 != 0) ?
                                     (float)(Amount4 * -Math.Abs(Math.Cos(Math.PI * (i + Amount3) / Amount3))) + Amount4 :
                                     (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 2f) / Amount3)));
