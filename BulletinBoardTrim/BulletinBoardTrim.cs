@@ -31,16 +31,16 @@ namespace BulletinBoardTrimEffect
 
         private enum PropertyNames
         {
-            Amount1,
-            Amount2,
-            Amount3,
-            Amount4,
-            Amount5,
-            Amount6,
-            Amount7,
-            Amount8,
-            Amount9,
-            Amount10
+            TrimSize,
+            HumpStyle,
+            HumpGap,
+            HumpProtrusion,
+            TrimColor,
+            TrimBorder,
+            OverlapBorder,
+            BorderWidth,
+            BorderColor,
+            TrimOpactiy
         }
 
         private enum HumpStyle
@@ -62,23 +62,23 @@ namespace BulletinBoardTrimEffect
 
             List<Property> props = new List<Property>
             {
-                new Int32Property(PropertyNames.Amount1, 50, 0, 100),
-                StaticListChoiceProperty.CreateForEnum<HumpStyle>(PropertyNames.Amount2, 0, false),
-                new Int32Property(PropertyNames.Amount3, 60, 5, 100),
-                new Int32Property(PropertyNames.Amount4, 20, 5, 100),
-                new Int32Property(PropertyNames.Amount5, ColorBgra.ToOpaqueInt32(primaryColor), 0, 0xffffff),
-                new BooleanProperty(PropertyNames.Amount6, false),
-                new BooleanProperty(PropertyNames.Amount7, false),
-                new Int32Property(PropertyNames.Amount8, 2, 2, 10),
-                new Int32Property(PropertyNames.Amount9, ColorBgra.ToOpaqueInt32(secondaryColor), 0, 0xffffff),
-                new Int32Property(PropertyNames.Amount10, 255, 0, 255)
+                new Int32Property(PropertyNames.TrimSize, 50, 0, 100),
+                StaticListChoiceProperty.CreateForEnum<HumpStyle>(PropertyNames.HumpStyle, 0, false),
+                new Int32Property(PropertyNames.HumpGap, 60, 5, 100),
+                new Int32Property(PropertyNames.HumpProtrusion, 20, 5, 100),
+                new Int32Property(PropertyNames.TrimColor, ColorBgra.ToOpaqueInt32(primaryColor), 0, 0xffffff),
+                new BooleanProperty(PropertyNames.TrimBorder, false),
+                new BooleanProperty(PropertyNames.OverlapBorder, false),
+                new Int32Property(PropertyNames.BorderWidth, 2, 2, 10),
+                new Int32Property(PropertyNames.BorderColor, ColorBgra.ToOpaqueInt32(secondaryColor), 0, 0xffffff),
+                new Int32Property(PropertyNames.TrimOpactiy, 255, 0, 255)
             };
 
             List<PropertyCollectionRule> propRules = new List<PropertyCollectionRule>
             {
-                new ReadOnlyBoundToBooleanRule(PropertyNames.Amount7, PropertyNames.Amount6, true),
-                new ReadOnlyBoundToBooleanRule(PropertyNames.Amount8, PropertyNames.Amount6, true),
-                new ReadOnlyBoundToBooleanRule(PropertyNames.Amount9, PropertyNames.Amount6, true)
+                new ReadOnlyBoundToBooleanRule(PropertyNames.OverlapBorder, PropertyNames.TrimBorder, true),
+                new ReadOnlyBoundToBooleanRule(PropertyNames.BorderWidth, PropertyNames.TrimBorder, true),
+                new ReadOnlyBoundToBooleanRule(PropertyNames.BorderColor, PropertyNames.TrimBorder, true)
             };
 
             return new PropertyCollection(props, propRules);
@@ -88,53 +88,53 @@ namespace BulletinBoardTrimEffect
         {
             ControlInfo configUI = CreateDefaultConfigUI(props);
 
-            configUI.SetPropertyControlValue(PropertyNames.Amount1, ControlInfoPropertyNames.DisplayName, "Trim Size");
-            configUI.SetPropertyControlValue(PropertyNames.Amount2, ControlInfoPropertyNames.DisplayName, "Hump Style");
-            PropertyControlInfo Amount2Control = configUI.FindControlForPropertyName(PropertyNames.Amount2);
-            Amount2Control.SetValueDisplayName(HumpStyle.RoundWave, "Round Wave");
-            Amount2Control.SetValueDisplayName(HumpStyle.PointyWave, "Pointy Wave");
-            Amount2Control.SetValueDisplayName(HumpStyle.SquareWave, "Square Wave");
-            Amount2Control.SetValueDisplayName(HumpStyle.WishboneWave, "Wishbone Wave");
-            Amount2Control.SetValueDisplayName(HumpStyle.PointyRound1Out, "Pointy / Round (out)");
-            Amount2Control.SetValueDisplayName(HumpStyle.PointyRound1In, "Pointy / Round (in)");
-            Amount2Control.SetValueDisplayName(HumpStyle.PointyRound2In, "Pointy & Round (in)");
-            Amount2Control.SetValueDisplayName(HumpStyle.PointyRound2Out, "Pointy & Round (out)");
-            configUI.SetPropertyControlValue(PropertyNames.Amount3, ControlInfoPropertyNames.DisplayName, "Hump Gap");
-            configUI.SetPropertyControlValue(PropertyNames.Amount4, ControlInfoPropertyNames.DisplayName, "Hump Protrusion");
-            configUI.SetPropertyControlValue(PropertyNames.Amount5, ControlInfoPropertyNames.DisplayName, "Trim Color");
-            configUI.SetPropertyControlType(PropertyNames.Amount5, PropertyControlType.ColorWheel);
-            configUI.SetPropertyControlValue(PropertyNames.Amount6, ControlInfoPropertyNames.DisplayName, "Trim Border");
-            configUI.SetPropertyControlValue(PropertyNames.Amount6, ControlInfoPropertyNames.Description, "Draw Border");
-            configUI.SetPropertyControlValue(PropertyNames.Amount7, ControlInfoPropertyNames.DisplayName, string.Empty);
-            configUI.SetPropertyControlValue(PropertyNames.Amount7, ControlInfoPropertyNames.Description, "Overlap Border in Corners");
-            configUI.SetPropertyControlValue(PropertyNames.Amount8, ControlInfoPropertyNames.DisplayName, "Border Width");
-            configUI.SetPropertyControlValue(PropertyNames.Amount9, ControlInfoPropertyNames.DisplayName, "Border Color");
-            configUI.SetPropertyControlType(PropertyNames.Amount9, PropertyControlType.ColorWheel);
-            configUI.SetPropertyControlValue(PropertyNames.Amount10, ControlInfoPropertyNames.DisplayName, "Trim Opacity");
-            configUI.SetPropertyControlValue(PropertyNames.Amount10, ControlInfoPropertyNames.ControlColors, new ColorBgra[] { ColorBgra.White, ColorBgra.Black });
+            configUI.SetPropertyControlValue(PropertyNames.TrimSize, ControlInfoPropertyNames.DisplayName, "Trim Size");
+            configUI.SetPropertyControlValue(PropertyNames.HumpStyle, ControlInfoPropertyNames.DisplayName, "Hump Style");
+            PropertyControlInfo humpStyleControl = configUI.FindControlForPropertyName(PropertyNames.HumpStyle);
+            humpStyleControl.SetValueDisplayName(HumpStyle.RoundWave, "Round Wave");
+            humpStyleControl.SetValueDisplayName(HumpStyle.PointyWave, "Pointy Wave");
+            humpStyleControl.SetValueDisplayName(HumpStyle.SquareWave, "Square Wave");
+            humpStyleControl.SetValueDisplayName(HumpStyle.WishboneWave, "Wishbone Wave");
+            humpStyleControl.SetValueDisplayName(HumpStyle.PointyRound1Out, "Pointy / Round (out)");
+            humpStyleControl.SetValueDisplayName(HumpStyle.PointyRound1In, "Pointy / Round (in)");
+            humpStyleControl.SetValueDisplayName(HumpStyle.PointyRound2In, "Pointy & Round (in)");
+            humpStyleControl.SetValueDisplayName(HumpStyle.PointyRound2Out, "Pointy & Round (out)");
+            configUI.SetPropertyControlValue(PropertyNames.HumpGap, ControlInfoPropertyNames.DisplayName, "Hump Gap");
+            configUI.SetPropertyControlValue(PropertyNames.HumpProtrusion, ControlInfoPropertyNames.DisplayName, "Hump Protrusion");
+            configUI.SetPropertyControlValue(PropertyNames.TrimColor, ControlInfoPropertyNames.DisplayName, "Trim Color");
+            configUI.SetPropertyControlType(PropertyNames.TrimColor, PropertyControlType.ColorWheel);
+            configUI.SetPropertyControlValue(PropertyNames.TrimBorder, ControlInfoPropertyNames.DisplayName, "Trim Border");
+            configUI.SetPropertyControlValue(PropertyNames.TrimBorder, ControlInfoPropertyNames.Description, "Draw Border");
+            configUI.SetPropertyControlValue(PropertyNames.OverlapBorder, ControlInfoPropertyNames.DisplayName, string.Empty);
+            configUI.SetPropertyControlValue(PropertyNames.OverlapBorder, ControlInfoPropertyNames.Description, "Overlap Border in Corners");
+            configUI.SetPropertyControlValue(PropertyNames.BorderWidth, ControlInfoPropertyNames.DisplayName, "Border Width");
+            configUI.SetPropertyControlValue(PropertyNames.BorderColor, ControlInfoPropertyNames.DisplayName, "Border Color");
+            configUI.SetPropertyControlType(PropertyNames.BorderColor, PropertyControlType.ColorWheel);
+            configUI.SetPropertyControlValue(PropertyNames.TrimOpactiy, ControlInfoPropertyNames.DisplayName, "Trim Opacity");
+            configUI.SetPropertyControlValue(PropertyNames.TrimOpactiy, ControlInfoPropertyNames.ControlColors, new ColorBgra[] { ColorBgra.White, ColorBgra.Black });
 
             return configUI;
         }
 
         protected override void OnSetRenderInfo(PropertyBasedEffectConfigToken newToken, RenderArgs dstArgs, RenderArgs srcArgs)
         {
-            Amount1 = newToken.GetProperty<Int32Property>(PropertyNames.Amount1).Value;
-            Amount2 = (HumpStyle)newToken.GetProperty<StaticListChoiceProperty>(PropertyNames.Amount2).Value;
-            Amount3 = newToken.GetProperty<Int32Property>(PropertyNames.Amount3).Value;
-            Amount4 = newToken.GetProperty<Int32Property>(PropertyNames.Amount4).Value;
-            Amount5 = ColorBgra.FromOpaqueInt32(newToken.GetProperty<Int32Property>(PropertyNames.Amount5).Value);
-            Amount6 = newToken.GetProperty<BooleanProperty>(PropertyNames.Amount6).Value;
-            Amount7 = newToken.GetProperty<BooleanProperty>(PropertyNames.Amount7).Value;
-            Amount8 = newToken.GetProperty<Int32Property>(PropertyNames.Amount8).Value;
-            Amount9 = ColorBgra.FromOpaqueInt32(newToken.GetProperty<Int32Property>(PropertyNames.Amount9).Value);
-            Amount10 = newToken.GetProperty<Int32Property>(PropertyNames.Amount10).Value;
+            size = newToken.GetProperty<Int32Property>(PropertyNames.TrimSize).Value;
+            humpStyle = (HumpStyle)newToken.GetProperty<StaticListChoiceProperty>(PropertyNames.HumpStyle).Value;
+            humpGap = newToken.GetProperty<Int32Property>(PropertyNames.HumpGap).Value;
+            humpProtru = newToken.GetProperty<Int32Property>(PropertyNames.HumpProtrusion).Value;
+            trimColor = ColorBgra.FromOpaqueInt32(newToken.GetProperty<Int32Property>(PropertyNames.TrimColor).Value);
+            trimBorder = newToken.GetProperty<BooleanProperty>(PropertyNames.TrimBorder).Value;
+            overlapBorder = newToken.GetProperty<BooleanProperty>(PropertyNames.OverlapBorder).Value;
+            borderWidth = newToken.GetProperty<Int32Property>(PropertyNames.BorderWidth).Value;
+            borderColor = ColorBgra.FromOpaqueInt32(newToken.GetProperty<Int32Property>(PropertyNames.BorderColor).Value);
+            trimOpacity = newToken.GetProperty<Int32Property>(PropertyNames.TrimOpactiy).Value;
 
             Rectangle selection = EnvironmentParameters.GetSelection(srcArgs.Surface.Bounds).GetBoundsInt();
             int centerX = ((selection.Right - selection.Left) / 2) + selection.Left;
             int centerY = ((selection.Bottom - selection.Top) / 2) + selection.Top;
-            int offsetX = centerX - selection.Width / Amount3 / 2 * Amount3;
-            int offsetY = centerY - selection.Height / Amount3 / 2 * Amount3;
-            float trimSize = Amount1 - Amount4 - (Amount6 ? Amount8 : 0);
+            int offsetX = centerX - selection.Width / humpGap / 2 * humpGap;
+            int offsetY = centerY - selection.Height / humpGap / 2 * humpGap;
+            float trimSize = size - humpProtru - (trimBorder ? borderWidth : 0);
             float wave;
 
             // Horizontal Points
@@ -179,10 +179,10 @@ namespace BulletinBoardTrimEffect
                 Graphics board = ra.Graphics;
                 board.SmoothingMode = SmoothingMode.AntiAlias;
 
-                using (SolidBrush trimBrush = new SolidBrush(Amount5))
-                using (Pen borderPen = new Pen(Amount9, Amount8 * 2))
+                using (SolidBrush trimBrush = new SolidBrush(trimColor))
+                using (Pen borderPen = new Pen(borderColor, borderWidth * 2))
                 {
-                    if (Amount7 && Amount6) // Border & Overlap
+                    if (overlapBorder && trimBorder) // Border & Overlap
                     {
                         board.DrawLines(borderPen, topPoints);
                         board.FillPolygon(trimBrush, topPoints);
@@ -197,14 +197,14 @@ namespace BulletinBoardTrimEffect
                         board.FillPolygon(trimBrush, leftPoints);
 
                         // Top Left hackfix
-                        PointF[] fixPoints = new PointF[Amount1 + Amount8 + 1];
+                        PointF[] fixPoints = new PointF[size + borderWidth + 1];
                         Array.Copy(topPoints, fixPoints, fixPoints.Length);
                         board.DrawLines(borderPen, fixPoints);
-                        Array.Resize(ref topPoints, Amount1 + Amount8 + 20);
-                        topPoints[Amount1 + Amount8 + 19] = new PointF(selection.Left + Amount1 + Amount8 + 17, selection.Top - 50);
+                        Array.Resize(ref topPoints, size + borderWidth + 20);
+                        topPoints[size + borderWidth + 19] = new PointF(selection.Left + size + borderWidth + 17, selection.Top - 50);
                         board.FillPolygon(trimBrush, topPoints);
                     }
-                    else if (Amount6) // Border only
+                    else if (trimBorder) // Border only
                     {
                         board.DrawLines(borderPen, topPoints);
                         board.DrawLines(borderPen, rightPoints);
@@ -238,16 +238,16 @@ namespace BulletinBoardTrimEffect
             }
         }
 
-        private int Amount1 = 50; // [0,100] Trim Size
-        private HumpStyle Amount2 = 0; // Hump Style|Round Wave|Pointy Wave|Square Wave|Wishbone Wave|Pointy / Round (out)|Pointy / Round (in)|Pointy & Round (in)|Pointy & Round (out)
-        private int Amount3 = 60; // [5,100] Hump Gap
-        private int Amount4 = 20; // [5,100] Hump Protrusion
-        private ColorBgra Amount5 = ColorBgra.FromBgr(0, 0, 0); // [PrimaryColor] Trim Color
-        private bool Amount6 = false; // [0,1] Border
-        private bool Amount7 = false; // [0,1] Overlap in Corners
-        private int Amount8 = 2; // [2,10] Border Width
-        private ColorBgra Amount9 = ColorBgra.FromBgr(255, 0, 255); // [SecondaryColor] Border Color
-        private int Amount10 = 255; // [0,255] Trim Opacity
+        private int size = 50; // [0,100] Trim Size
+        private HumpStyle humpStyle = 0; // Hump Style|Round Wave|Pointy Wave|Square Wave|Wishbone Wave|Pointy / Round (out)|Pointy / Round (in)|Pointy & Round (in)|Pointy & Round (out)
+        private int humpGap = 60; // [5,100] Hump Gap
+        private int humpProtru = 20; // [5,100] Hump Protrusion
+        private ColorBgra trimColor = ColorBgra.FromBgr(0, 0, 0); // [PrimaryColor] Trim Color
+        private bool trimBorder = false; // [0,1] Border
+        private bool overlapBorder = false; // [0,1] Overlap in Corners
+        private int borderWidth = 2; // [2,10] Border Width
+        private ColorBgra borderColor = ColorBgra.FromBgr(255, 0, 255); // [SecondaryColor] Border Color
+        private int trimOpacity = 255; // [0,255] Trim Opacity
 
         private readonly BinaryPixelOp normalOp = LayerBlendModeUtil.CreateCompositionOp(LayerBlendMode.Normal);
         private Surface trimSurface;
@@ -262,7 +262,7 @@ namespace BulletinBoardTrimEffect
                 {
                     sourcePixel = src[x, y];
                     trimPixel = trimSurface[x, y];
-                    trimPixel.A = Int32Util.ClampToByte(trimPixel.A * Amount10 / 255);
+                    trimPixel.A = Int32Util.ClampToByte(trimPixel.A * trimOpacity / 255);
                     dst[x, y] = normalOp.Apply(sourcePixel, trimPixel);
                 }
             }
@@ -271,30 +271,30 @@ namespace BulletinBoardTrimEffect
         private float GetEquation(int i)
         {
             i = Math.Abs(i);
-            switch (Amount2)
+            switch (humpStyle)
             {
                 case HumpStyle.RoundWave: // Cosine Wave
-                    return (float)(Amount4 / 2f * Math.Cos(Math.PI * i / (Amount3 / 2f))) + Amount4 / 2f;
+                    return (float)(humpProtru / 2f * Math.Cos(Math.PI * i / (humpGap / 2f))) + humpProtru / 2f;
                 case HumpStyle.PointyWave: // Pointy Wave
-                    return (float)((Amount4 / Math.PI) * Math.Acos(Math.Cos(2 * (Math.PI / Amount3) * (i + Amount3 / 2f))));
+                    return (float)((humpProtru / Math.PI) * Math.Acos(Math.Cos(2 * (Math.PI / humpGap) * (i + humpGap / 2f))));
                 case HumpStyle.SquareWave: // Square Wave
-                    return (Math.Sin(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)) >= 0) ? Amount4 : 0;
+                    return (Math.Sin(Math.PI * (i + humpGap / 4f) / (humpGap / 2f)) >= 0) ? humpProtru : 0;
                 case HumpStyle.WishboneWave: // Wish Bone
-                    return ((int)((i + Amount3 / 4f) / (Amount3 / 2f)) % 2 != 0) ?
-                                    (float)(Amount4 / 2f * Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)))) :
-                                    (float)(Amount4 / 2f * -Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 4f) / (Amount3 / 2f)))) + Amount4;
+                    return ((int)((i + humpGap / 4f) / (humpGap / 2f)) % 2 != 0) ?
+                                    (float)(humpProtru / 2f * Math.Abs(Math.Cos(Math.PI * (i + humpGap / 4f) / (humpGap / 2f)))) :
+                                    (float)(humpProtru / 2f * -Math.Abs(Math.Cos(Math.PI * (i + humpGap / 4f) / (humpGap / 2f)))) + humpProtru;
                 case HumpStyle.PointyRound1Out: // Pointy / Round (out)
-                    return (float)(Amount4 * -Math.Abs(Math.Sin(Math.PI * i / Amount3))) + Amount4;
+                    return (float)(humpProtru * -Math.Abs(Math.Sin(Math.PI * i / humpGap))) + humpProtru;
                 case HumpStyle.PointyRound1In: // Pointy / Round (in)
-                    return (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * i / Amount3)));
+                    return (float)(humpProtru * Math.Abs(Math.Cos(Math.PI * i / humpGap)));
                 case HumpStyle.PointyRound2In: // Pointy & Round (in)
-                    return ((int)((i + Amount3 / 2f) / Amount3) % 2 != 0) ?
-                                    (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * (i + Amount3) / Amount3))) :
-                                    (float)(Amount4 * -Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 2f) / Amount3))) + Amount4;
+                    return ((int)((i + humpGap / 2f) / humpGap) % 2 != 0) ?
+                                    (float)(humpProtru * Math.Abs(Math.Cos(Math.PI * (i + humpGap) / humpGap))) :
+                                    (float)(humpProtru * -Math.Abs(Math.Cos(Math.PI * (i + humpGap / 2f) / humpGap))) + humpProtru;
                 case HumpStyle.PointyRound2Out: // Pointy & Round (out)
-                    return ((int)((i + Amount3 / 2f) / Amount3) % 2 != 0) ?
-                                    (float)(Amount4 * -Math.Abs(Math.Cos(Math.PI * (i + Amount3) / Amount3))) + Amount4 :
-                                    (float)(Amount4 * Math.Abs(Math.Cos(Math.PI * (i + Amount3 / 2f) / Amount3)));
+                    return ((int)((i + humpGap / 2f) / humpGap) % 2 != 0) ?
+                                    (float)(humpProtru * -Math.Abs(Math.Cos(Math.PI * (i + humpGap) / humpGap))) + humpProtru :
+                                    (float)(humpProtru * Math.Abs(Math.Cos(Math.PI * (i + humpGap / 2f) / humpGap)));
             }
             return 0;
         }
